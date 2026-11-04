@@ -59,28 +59,31 @@ class Player(Sprite):
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
+        self.cofric = -0.1
         self.last_update = 0
         self.current_frame = 0
         self.coins = 0
-        print("player initialized...")
-    
+        self.jumping = False
+
+
     def get_keys(self):
-        # reset velocity to zero
         # listen for events specific to keys
         # change velocity based on which key is pressed
-        self.vel = vec(0,0)
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vel.x = -PLAYER_SPEED
+            self.acc.x = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vel.x = PLAYER_SPEED
+            self.acc.x = PLAYER_SPEED
         if keys[pg.K_UP] or keys[pg.K_w]:
-            self.vel.y = -PLAYER_SPEED
+            self.acc.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vel.y = PLAYER_SPEED
+            self.acc.y = PLAYER_SPEED
         # check if player is diagonal
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
+
+    def jump(self):
+        pass
 
     def animate(self):
         now = pg.time.get_ticks()
@@ -104,7 +107,11 @@ class Player(Sprite):
         # updates everything, letting you move
         # as well as show animations
         # updates score
+        self.acc = vec(0,0)
         self.get_keys()
+        self.acc.x += self.vel.x * self.cofric
+        self.acc.y += self.vel.y * self.cofric
+        self.vel += self.acc
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         # when the player collides with a coin, send out particles and increase score/coins
         if hits:
@@ -115,7 +122,7 @@ class Player(Sprite):
             self.game.score += 1
         self.animate()
         self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, "x")
         self.hit_rect.centery = self.pos.y
@@ -142,7 +149,7 @@ class Wall(Sprite):
         self.y = y * TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
-        # print("wall initialized...")
+
 
     def load_images(self):
         # cycles through images in the spritesheet to animate
@@ -150,7 +157,7 @@ class Wall(Sprite):
 
 class Particle(Sprite):
     def __init__(self, game, x, y):
-        # properties of walls
+        # properties of particles
         # size, position, color/image
         self.groups = game.all_sprites, game.all_particles
         Sprite.__init__(self, self.groups)
@@ -168,16 +175,15 @@ class Particle(Sprite):
         self.speed = 25
         self.rect.x = self.x
         self.rect.y = self.y
-        self.countdown = Cooldown(5000)
+        self.countdown = Timer()
         self.countdown.event_time = floor(pg.time.get_ticks()/1000)
-        print(self.rect.x)
-        print(self.rect.y)
+
     
     def update(self):
         self.countdown.ticking()
         self.rect.x += self.speed * randint(-5,5)
         self.rect.y += self.speed * randint(-5,5)
-        if self.countdown.delta > 1.5:
+        if self.countdown.delta > 1:
             self.kill()
 
 
@@ -199,7 +205,7 @@ class Coin(Sprite):
         self.y = y * TILESIZE
         self.rect.x = self.x
         self.rect.y = self.y
-        # print("wall initialized...")
+
 
     def load_images(self):
         # cycles through images in the spritesheet to animate
@@ -226,7 +232,7 @@ class Mob(Sprite):
         self.last_update = 0
         self.current_frame = 0
         self.hit_rect = MOB_HIT_RECT
-        print("Mob initialized...")
+
 
     def animate(self):
         now = pg.time.get_ticks()

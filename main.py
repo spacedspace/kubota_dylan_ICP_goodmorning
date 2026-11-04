@@ -20,14 +20,8 @@ enemy position, aim in FPS, etc.
 
 Output: graphics - things are drawn, sound - , etc.
 
-GOALS: make money, own vehicles, commit crimes
-
-RULES: can't leave map, somewhat realistic physics
-
-FEEDBACK: when taking damage screen turns red,
-recoil when shooting, money counter
-
-FREEDOM:
+First game idea: puzzle game with separate txt files for levels with different
+objects to manipulate to find the exit
 
 
 '''
@@ -39,7 +33,6 @@ class Game:
         pg.init()
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        print("game initialized...")
         pg.display.set_caption(TITLE)
         self.running = True
         self.playing = True
@@ -63,7 +56,7 @@ class Game:
                 file.write("hello world")
             print("file created successfully!")
         except FileExistsError:
-            print("file already exists")
+            print("high score file already exists")
         
         with open(self.game_save_file, "r") as file:
             try:
@@ -75,7 +68,6 @@ class Game:
     # makes player, walls, mobs, etc.
     def new(self):
         self.load_data("level1.txt")
-        # print(self.map.data)
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
