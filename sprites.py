@@ -78,12 +78,32 @@ class Player(Sprite):
             self.acc.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_SPEED
+        if keys[pg.K_SPACE]:
+            self.jump()
         # check if player is diagonal
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
 
     def jump(self):
-        pass
+        # checks if player is touching the wall
+        # and that it's not already jumping
+        # to then decrease player's y val, or jumping
+        self.rect.y += 2
+        hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+        self.rect.y -= 2
+        if hits and not self.jumping:
+            self.game.jump_snd.play()
+            self.jumping = True
+            self.vel.y = -PLAYER_JUMP
+    
+    def is_jumping(self):
+        # checking to see if the player is falling,
+        # then if it is touching a wall, to return if it is jumping or not
+        if self.vel.y > 0:
+            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+            if hits:
+                self.jumping = False
+
 
     def animate(self):
         now = pg.time.get_ticks()
@@ -107,7 +127,9 @@ class Player(Sprite):
         # updates everything, letting you move
         # as well as show animations
         # updates score
-        self.acc = vec(0,0)
+        self.animate()
+        self.is_jumping()
+        self.acc = vec(0,PLAYER_GRAVITY)
         self.get_keys()
         self.acc.x += self.vel.x * self.cofric
         self.acc.y += self.vel.y * self.cofric
@@ -120,16 +142,15 @@ class Player(Sprite):
             self.coins += 1
             self.game.pickup_snd.play()
             self.game.score += 1
-        self.animate()
         self.rect.center = self.pos
         self.pos += self.vel * self.game.dt + 0.5 * self.acc
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, "x")
         self.hit_rect.centery = self.pos.y
         collide_with_walls(self, self.game.all_walls, "y")
+        if collide_with_walls(self, self.game.all_walls, "y"):
+            self.jumping = False
         self.rect.center = self.hit_rect.center
-        # hits = 
-
 
 
 class Wall(Sprite):

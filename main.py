@@ -7,6 +7,8 @@ import pygame as pg
 from settings import *
 from sprites import *
 from utils import *
+from math import floor
+
 
 '''
 Data types: boolean, string, int, etc.
@@ -47,6 +49,7 @@ class Game:
         self.img_dir = path.join(self.game_dir, "images")
         self.snd_dir = path.join(self.game_dir, "audio")
         self.pickup_snd = pg.mixer.Sound(path.join(self.snd_dir, "coin02.wav"))
+        self.jump_snd = pg.mixer.Sound(path.join(self.snd_dir, "jump1.mp3"))
         self.map = Map(path.join(self.game_dir, map))
 
 
