@@ -59,7 +59,7 @@ class Player(Sprite):
         self.hit_rect = PLAYER_HIT_RECT
         self.vel = vec(0,0)
         self.pos = vec(x*TILESIZE,y*TILESIZE)
-        self.cofric = -0.1
+        self.cofric = PLAYER_FRIC
         self.last_update = 0
         self.current_frame = 0
         self.coins = 0
@@ -87,22 +87,24 @@ class Player(Sprite):
     def jump(self):
         # checks if player is touching the wall
         # and that it's not already jumping
-        # to then decrease player's y val, or jumping
+        # to then decrease player's y val, or jump
         self.rect.y += 2
         hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
         self.rect.y -= 2
         if hits and not self.jumping:
             self.game.jump_snd.play()
-            self.jumping = True
             self.vel.y = -PLAYER_JUMP
+            # self.pos.y -= 30
+            self.jumping = True
+
+
     
     def is_jumping(self):
         # checking to see if the player is falling,
         # then if it is touching a wall, to return if it is jumping or not
-        if self.vel.y > 0:
-            hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
-            if hits:
-                self.jumping = False
+        hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+        if hits and self.vel.y == 0:
+            self.jumping = False
 
 
     def animate(self):
@@ -131,9 +133,10 @@ class Player(Sprite):
         self.is_jumping()
         self.acc = vec(0,PLAYER_GRAVITY)
         self.get_keys()
-        self.acc.x += self.vel.x * self.cofric
-        self.acc.y += self.vel.y * self.cofric
+        self.acc.x += self.vel.x * PLAYER_FRIC
+        self.acc.y += self.vel.y * PLAYER_FRIC
         self.vel += self.acc
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         # when the player collides with a coin, send out particles and increase score/coins
         if hits:
@@ -142,8 +145,6 @@ class Player(Sprite):
             self.coins += 1
             self.game.pickup_snd.play()
             self.game.score += 1
-        self.rect.center = self.pos
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, "x")
         self.hit_rect.centery = self.pos.y

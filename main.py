@@ -23,7 +23,21 @@ enemy position, aim in FPS, etc.
 Output: graphics - things are drawn, sound - , etc.
 
 First game idea: puzzle game with separate txt files for levels with different
-objects to manipulate to find the exit
+objects as powerups to use strategically to reach the exit
+
+GOALS: Reach the level exit
+
+RULES: Can only jump with power up,
+powerups are single-use unless multiple are collected
+
+FEEDBACK: Powerups make sounds when picked up,
+powerups also make sounds when used
+
+FREEDOM: Affected by gravity, can't jump without powerup,
+confined to the walls of the level
+
+MECHANICS: Player can move left and right,
+can use powerups picked up throughout the level
 
 
 '''
