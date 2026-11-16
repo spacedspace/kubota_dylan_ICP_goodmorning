@@ -88,7 +88,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
-        self.all_coins = pg.sprite.Group()
+        self.all_collectibles = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
 
 
@@ -108,7 +108,7 @@ class Game:
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):
                 if tile == "C":
-                    Coin(self, col, row)
+                    Collectible(self, col, row)
         # player
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):

@@ -93,8 +93,8 @@ class Player(Sprite):
         self.rect.y -= 2
         if hits and not self.jumping:
             self.game.jump_snd.play()
-            self.vel.y = -PLAYER_JUMP
-            # self.pos.y -= 30
+            # self.vel.y = -PLAYER_JUMP
+            self.pos.y -= 30
             self.jumping = True
 
 
@@ -136,8 +136,10 @@ class Player(Sprite):
         self.acc.x += self.vel.x * PLAYER_FRIC
         self.acc.y += self.vel.y * PLAYER_FRIC
         self.vel += self.acc
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc
-        hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
+        self.pos += 0.5 * self.acc + self.vel * self.game.dt
+        # print(self.game.dt)
+        print(self.pos)
+        hits = pg.sprite.spritecollide(self, self.game.all_collectibles, True)
         # when the player collides with a coin, send out particles and increase score/coins
         if hits:
             for i in range(10):
@@ -209,11 +211,11 @@ class Particle(Sprite):
             self.kill()
 
 
-class Coin(Sprite):
+class Collectible(Sprite):
     def __init__(self, game, x, y):
-        # properties of coins
+        # properties of collectibles
         # size, position, color/image
-        self.groups = game.all_sprites, game.all_coins
+        self.groups = game.all_sprites, game.all_collectibles
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
