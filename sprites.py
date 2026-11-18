@@ -64,6 +64,9 @@ class Player(Sprite):
         self.current_frame = 0
         self.coins = 0
         self.jumping = False
+        self.has_dash = False
+        self.has_jump = False
+        self.has_no_grav = False
 
 
     def get_keys(self):
@@ -139,7 +142,7 @@ class Player(Sprite):
         self.pos += 0.5 * self.acc + self.vel * self.game.dt
         # print(self.game.dt)
         print(self.pos)
-        hits = pg.sprite.spritecollide(self, self.game.all_collectibles, True)
+        hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         # when the player collides with a coin, send out particles and increase score/coins
         if hits:
             for i in range(10):
@@ -211,11 +214,11 @@ class Particle(Sprite):
             self.kill()
 
 
-class Collectible(Sprite):
+class Coin(Sprite):
     def __init__(self, game, x, y):
-        # properties of collectibles
+        # properties of coins
         # size, position, color/image
-        self.groups = game.all_sprites, game.all_collectibles
+        self.groups = game.all_sprites, game.all_coins, game.all_collectibles
         Sprite.__init__(self, self.groups)
         self.game = game
         self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
@@ -234,6 +237,56 @@ class Collectible(Sprite):
     def load_images(self):
         # cycles through images in the spritesheet to animate
         self.idle_frames = [self.spritesheet.get_image(TILESIZE,TILESIZE*2,TILESIZE,TILESIZE)]
+
+
+class DashPowerup(Sprite):
+    def __init__(self, game, x, y):
+        # properties of dash powerup
+        # size, position, color/image
+        self.groups = game.all_sprites, game.all_dashes, game.all_collectibles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.load_images()
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.spritesheet.get_image(0, TILESIZE*3, TILESIZE, TILESIZE)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+
+    def load_images(self):
+        # cycles through images in the spritesheet to animate
+        self.idle_frames = [self.spritesheet.get_image(0,TILESIZE*3,TILESIZE,TILESIZE)]
+
+
+class JumpPowerup(Sprite):
+    def __init__(self, game, x, y):
+        # properties of jump powerup
+        # size, position, color/image
+        self.groups = game.all_sprites, game.all_jumps, game.all_collectibles
+        Sprite.__init__(self, self.groups)
+        self.game = game
+        self.spritesheet = Spritesheet(path.join(self.game.img_dir, "sprite_sheet.png"))
+        self.load_images()
+        # self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = self.spritesheet.get_image(TILESIZE, TILESIZE*3, TILESIZE, TILESIZE)
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.vx, self.vy = 0,0
+        self.x = x * TILESIZE
+        self.y = y * TILESIZE
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+
+    def load_images(self):
+        # cycles through images in the spritesheet to animate
+        self.idle_frames = [self.spritesheet.get_image(TILESIZE,TILESIZE*3,TILESIZE,TILESIZE)]
 
 
 class Mob(Sprite):

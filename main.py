@@ -88,8 +88,12 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
-        self.all_collectibles = pg.sprite.Group()
+        self.all_coins = pg.sprite.Group()
         self.all_particles = pg.sprite.Group()
+        self.all_collectibles = pg.sprite.Group()
+        self.all_dashes = pg.sprite.Group()
+        self.all_jumps = pg.sprite.Group()
+        self.all_feathers = pg.sprite.Group()
 
 
         # instantiates entities based on the level map
@@ -108,7 +112,20 @@ class Game:
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):
                 if tile == "C":
-                    Collectible(self, col, row)
+                    Coin(self, col, row)
+        
+        # dashes
+        for row, tiles in enumerate(self.map.data):
+            for col, tile, in enumerate(tiles):
+                if tile == "D":
+                    DashPowerup(self, col, row)
+
+        # jumps
+        for row, tiles in enumerate(self.map.data):
+            for col, tile, in enumerate(tiles):
+                if tile == "J":
+                    JumpPowerup(self, col, row)
+
         # player
         for row, tiles in enumerate(self.map.data):
             for col, tile, in enumerate(tiles):
