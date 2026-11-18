@@ -103,10 +103,10 @@ class Game:
                 if tile == "1":
                     Wall(self, col, row)
         # mobs
-        for row, tiles in enumerate(self.map.data):
-            for col, tile, in enumerate(tiles):
-                if tile == "M":
-                    Mob(self, col, row)
+        # for row, tiles in enumerate(self.map.data):
+        #     for col, tile, in enumerate(tiles):
+        #         if tile == "M":
+        #             Mob(self, col, row)
         
         # coins
         for row, tiles in enumerate(self.map.data):
@@ -179,6 +179,7 @@ class Game:
         self.draw_text("Coins: " + str(self.player.coins), 24, WHITE, WIDTH/2, HEIGHT/7)
         self.draw_text("Score: " + str(self.score), 24, WHITE, WIDTH/2, HEIGHT/9)
         self.draw_text("High score: " + str(self.high_score), 24, WHITE, WIDTH/2, HEIGHT/12)
+        self.draw_text("Have Dash: " + str(self.player.has_dash), 24, WHITE, WIDTH/2, HEIGHT/20)
         pg.display.flip()
 
 

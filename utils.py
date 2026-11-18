@@ -31,11 +31,7 @@ class Spritesheet:
 
 class Timer:
     def __init__(self):
-        self.event_time = 0
-        self.current_time = 0
-        self.delta = 0
+        self.event_time = floor((pg.time.get_ticks())/1000)
     
-    def ticking(self):
-        # gets current time and difference between current time and when the event happened
-        self.current_time = floor(pg.time.get_ticks()/1000)
-        self.delta = self.current_time - self.event_time
+    def get_delta(self):
+        return floor((pg.time.get_ticks())/1000) - self.event_time

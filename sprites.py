@@ -63,9 +63,10 @@ class Player(Sprite):
         self.last_update = 0
         self.current_frame = 0
         self.coins = 0
+        self.has_jump = False
         self.jumping = False
         self.has_dash = False
-        self.has_jump = False
+        self.dashing = False
         self.has_no_grav = False
 
 
@@ -77,12 +78,15 @@ class Player(Sprite):
             self.acc.x = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.acc.x = PLAYER_SPEED
-        if keys[pg.K_UP] or keys[pg.K_w]:
-            self.acc.y = -PLAYER_SPEED
+        # if keys[pg.K_UP] or keys[pg.K_w]:
+        #     self.acc.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_SPEED
         if keys[pg.K_SPACE]:
             self.jump()
+        if keys[pg.K_x]:
+            self.dash()
+            self.dash_timer = Timer()
         # check if player is diagonal
         if self.vel.x != 0 and self.vel.y != 0:
             self.vel *= 0.7071
@@ -96,10 +100,9 @@ class Player(Sprite):
         self.rect.y -= 2
         if hits and not self.jumping:
             self.game.jump_snd.play()
-            # self.vel.y = -PLAYER_JUMP
-            self.pos.y -= 30
+            self.vel.y = -PLAYER_JUMP
+            # self.pos.y -= 30
             self.jumping = True
-
 
     
     def is_jumping(self):
@@ -108,6 +111,22 @@ class Player(Sprite):
         hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
         if hits and self.vel.y == 0:
             self.jumping = False
+
+
+    def dash(self):
+        if self.has_dash:
+            if self.vel.x < 0:
+                self.vel.x -= 15
+                print("You used dash!")
+            elif self.vel.x > 0:
+                self.vel.x += 15
+                print("You used dash!")
+            else:
+                print("You just wasted your dash.")
+            self.dashing = True
+        else:
+            print("You don't have dash yet.")
+        self.has_dash = False
 
 
     def animate(self):
@@ -137,11 +156,31 @@ class Player(Sprite):
         self.acc = vec(0,PLAYER_GRAVITY)
         self.get_keys()
         self.acc.x += self.vel.x * PLAYER_FRIC
-        self.acc.y += self.vel.y * PLAYER_FRIC
+        self.acc.y += self.vel.y * PLAYER_AIR_FRIC
         self.vel += self.acc
-        self.pos += 0.5 * self.acc + self.vel * self.game.dt
-        # print(self.game.dt)
-        print(self.pos)
+        if self.vel.y > PLAYER_TERMINAL_VEL_Y - 20:
+            self.vel.y = PLAYER_TERMINAL_VEL_Y - 20
+        if self.dashing:
+            if self.dash_timer.get_delta() < 1:
+                if self.vel.x < -PLAYER_DASH_TERMINAL_VEL:
+                    self.vel.x = -PLAYER_DASH_TERMINAL_VEL
+                if self.vel.x > PLAYER_DASH_TERMINAL_VEL:
+                    self.vel.x = PLAYER_DASH_TERMINAL_VEL
+            else:
+                if self.vel.x < -PLAYER_TERMINAL_VEL_X:
+                    self.vel.x = -PLAYER_TERMINAL_VEL_X
+                if self.vel.x > PLAYER_TERMINAL_VEL_X:
+                    self.vel.x = PLAYER_TERMINAL_VEL_X
+                self.dashing = False
+        else:
+            if self.vel.x < -PLAYER_TERMINAL_VEL_X:
+                self.vel.x = -PLAYER_TERMINAL_VEL_X
+            if self.vel.x > PLAYER_TERMINAL_VEL_X:
+                self.vel.x = PLAYER_TERMINAL_VEL_X
+        # if self.dash_timer.get_delta() > 1:
+        #     self.dashing = False
+        print(self.vel.x)
+        self.pos += 0.5 * self.acc + self.vel
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         # when the player collides with a coin, send out particles and increase score/coins
         if hits:
@@ -150,6 +189,9 @@ class Player(Sprite):
             self.coins += 1
             self.game.pickup_snd.play()
             self.game.score += 1
+        hits_dash = pg.sprite.spritecollide(self, self.game.all_dashes, True)
+        if hits_dash:
+            self.has_dash = True
         self.hit_rect.centerx = self.pos.x
         collide_with_walls(self, self.game.all_walls, "x")
         self.hit_rect.centery = self.pos.y
@@ -203,14 +245,12 @@ class Particle(Sprite):
         self.rect.x = self.x
         self.rect.y = self.y
         self.countdown = Timer()
-        self.countdown.event_time = floor(pg.time.get_ticks()/1000)
 
     
     def update(self):
-        self.countdown.ticking()
         self.rect.x += self.speed * randint(-5,5)
         self.rect.y += self.speed * randint(-5,5)
-        if self.countdown.delta > 1:
+        if self.countdown.get_delta() > 1:
             self.kill()
 
 
