@@ -22,7 +22,7 @@ enemy position, aim in FPS, etc.
 
 Output: graphics - things are drawn, sound - , etc.
 
-First game idea: puzzle game with separate txt files for levels with different
+First game idea: puzzle/platformer game with separate txt files for levels with different
 objects as powerups to use strategically to reach the exit
 
 GOALS: Reach the level exit

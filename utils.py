@@ -31,7 +31,10 @@ class Spritesheet:
 
 class Timer:
     def __init__(self):
+        # gets time when the class was instantiated
         self.event_time = floor((pg.time.get_ticks())/1000)
     
     def get_delta(self):
+        # gets time that has passed since instantiation
+        # by subtracting current time from the time of instantiation
         return floor((pg.time.get_ticks())/1000) - self.event_time

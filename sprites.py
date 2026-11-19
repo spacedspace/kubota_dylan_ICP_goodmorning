@@ -68,6 +68,7 @@ class Player(Sprite):
         self.has_dash = False
         self.dashing = False
         self.has_no_grav = False
+        self.has_block_break = False
 
 
     def get_keys(self):
@@ -78,11 +79,9 @@ class Player(Sprite):
             self.acc.x = -PLAYER_SPEED
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.acc.x = PLAYER_SPEED
-        # if keys[pg.K_UP] or keys[pg.K_w]:
-        #     self.acc.y = -PLAYER_SPEED
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.acc.y = PLAYER_SPEED
-        if keys[pg.K_SPACE]:
+        if keys[pg.K_SPACE] or keys[pg.K_UP] or keys[pg.K_w]:
             self.jump()
         if keys[pg.K_x]:
             self.dash()
@@ -101,7 +100,6 @@ class Player(Sprite):
         if hits and not self.jumping:
             self.game.jump_snd.play()
             self.vel.y = -PLAYER_JUMP
-            # self.pos.y -= 30
             self.jumping = True
 
     
@@ -114,12 +112,15 @@ class Player(Sprite):
 
 
     def dash(self):
+        # checking if the dash powerup has been picked up
+        # and if the player is moving
+        # to then give the player a burst of speed on x axis
         if self.has_dash:
             if self.vel.x < 0:
-                self.vel.x -= 15
+                self.vel.x -= 25
                 print("You used dash!")
             elif self.vel.x > 0:
-                self.vel.x += 15
+                self.vel.x += 25
                 print("You used dash!")
             else:
                 print("You just wasted your dash.")
@@ -158,8 +159,11 @@ class Player(Sprite):
         self.acc.x += self.vel.x * PLAYER_FRIC
         self.acc.y += self.vel.y * PLAYER_AIR_FRIC
         self.vel += self.acc
+        # caps the player's velocity
         if self.vel.y > PLAYER_TERMINAL_VEL_Y - 20:
             self.vel.y = PLAYER_TERMINAL_VEL_Y - 20
+        # exception for player's max horizontal velocity
+        # only if they are dashing, which doubles the horizontal terminal velocity
         if self.dashing:
             if self.dash_timer.get_delta() < 1:
                 if self.vel.x < -PLAYER_DASH_TERMINAL_VEL:
@@ -177,9 +181,6 @@ class Player(Sprite):
                 self.vel.x = -PLAYER_TERMINAL_VEL_X
             if self.vel.x > PLAYER_TERMINAL_VEL_X:
                 self.vel.x = PLAYER_TERMINAL_VEL_X
-        # if self.dash_timer.get_delta() > 1:
-        #     self.dashing = False
-        print(self.vel.x)
         self.pos += 0.5 * self.acc + self.vel
         hits = pg.sprite.spritecollide(self, self.game.all_coins, True)
         # when the player collides with a coin, send out particles and increase score/coins
@@ -190,6 +191,8 @@ class Player(Sprite):
             self.game.pickup_snd.play()
             self.game.score += 1
         hits_dash = pg.sprite.spritecollide(self, self.game.all_dashes, True)
+        # when the player collides with the dash powerup,
+        # set has_dash to true
         if hits_dash:
             self.has_dash = True
         self.hit_rect.centerx = self.pos.x
